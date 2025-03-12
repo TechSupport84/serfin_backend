@@ -77,8 +77,8 @@ export const makaPayement = async (req, res) => {
         payment_method_types: ["card"],
         line_items: lineItems,
         mode: "payment",
-        success_url: "http://localhost:5173/Success",
-        cancel_url: "http://localhost:5173/cancel",
+        success_url: "https://serfinrecycle.netlify.app/Success",
+        cancel_url: "https://serfinrecycle.netlify.app/cancel",
       });
   
       res.json({ id: session.id });
