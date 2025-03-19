@@ -1,112 +1,135 @@
-import {Product} from "../models/product.model.js"
-import {Category} from "../models/category.model.js"
+import { Product } from "../models/product.model.js";
+import { Category } from "../models/category.model.js";
 import mongoose from "mongoose";
 
-const createProduct = async(req, res)=>{
-    const {name, description, price , category, brand, stock, rating } = req.body;
-    const imageUrlPath =req.files ? req.files.map(file => file.path.replace(/\\/g, "/")) : [];
-   
-    try{
-     if(!name || !description ||!price||! brand ||!stock ||!rating)
-     {
-       return res.status(400).json({success: false, message: "All fields are required! "})
-     }
-     let categoryId = category;
-     if (!categoryId) {
-         const defaultCategory = await Category.findOne();
-         categoryId = defaultCategory ? defaultCategory._id : null;
-     }
-     const newProducts = new Product({
-        name,
-        description,
-        price,
-        category:categoryId,
-        brand,
-        stock,
-        image:imageUrlPath,
-        rating:[],
+// Create Product
+const createProduct = async (req, res) => {
+    const { name, description, price, brand, stock, category } = req.body;
+    const imageUrlPath = req.files ? req.files.map(file => file.path.replace(/\\/g, "/")) : [];
 
-     })
-     await newProducts.save();
-     res.status(201).json({success: true, message:"Product created Successfully! ",newProducts})
-    }catch(error)
-    {
-        return res.status(500).json({success: false, message:"Internal  error occured !"})
-    }
-}
+    try {
+        if (!name || !description || !price || !brand || !stock) {
+            return res.status(400).json({ success: false, message: "All fields except category are required!" });
+        }
 
-const deteleProduct = async(req, res) =>{
-    const {id} = req.params;
-    try {
-        const products = await Product.findById(id)
-        if(!products)
-        {
-            return res.status(404).json({success: false, message: "NO products found !"})
-        }
-        await Product.findByIdAndDelete(id)
-        res.status(200).json({success: true, message:"Product deleted successfully!"}) 
-    } catch (error) {
-        res.status(500).json({success:false, message:"Internal error occured ! "})
-    }
-}
-const editProducts = async(req, res)=>{
-    const {id} = req.params;
-    const updateDate = req.body;
-    try {
-        const updateProduct = await Product.findById(id)
-        if(!updateProduct)
-        {
-            return res.status(404).json({success:false, message: "No product found "})
-        }
-        const newUPdate = await Product.findByIdAndUpdate(updateProduct,updateDate,{
-           new:true 
-        } )
-        res.status(200).json({success:true, message:"Product updated successfully!", newUPdate})
-    } catch (error) {
-        res.status(500).json({success: false, message:"Interanl error occured !"})
-    }
-}
-
-const getProducts = async(req, res) =>{
-    try {
-        const products =  await Product.find({})
-        if(!products)
-        {
-            return res.status(404).json({success: false, message:"No products  found ."})
-        }
-        res.status(200).json({success:true, message: "Products", product: products})
+        let categoryId = category;
         
+        // If no category is provided, find and assign the first available category
+        if (!categoryId) {
+            const defaultCategory = await Category.findOne();
+            if (!defaultCategory) {
+                return res.status(400).json({ success: false, message: "No categories available. Please create one first!" });
+            }
+            categoryId = defaultCategory._id;
+        }
+
+        const newProduct = new Product({
+            name,
+            description,
+            price,
+            category: categoryId,
+            brand,
+            stock,
+            image: imageUrlPath,
+            rating: [],
+        });
+
+        await newProduct.save();
+        res.status(201).json({ success: true, message: "Product created successfully!", product: newProduct });
     } catch (error) {
-        res.status(500).json({success: false, message:"Internal  error occured ."})
+        console.error("Error creating product:", error);
+        return res.status(500).json({ success: false, message: "Internal server error occurred!" });
     }
-}
-const  getProductById = async(req, res) =>{
-    const {id} = req.params;
+};
+
+
+// Delete Product
+const deleteProduct = async (req, res) => {
+    const { id } = req.params;
     try {
-        if(!mongoose.Types.ObjectId.isValid(id))
-        {
-            return res.status(400).json({success:false, message:"Invalid  Id format " })
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid Product ID format!" });
         }
-        const productId = await Product.findById(id);
-        if(!productId)
-        {
-            return res.status(404).json({success: false, message: "NO Product found"})
+
+        const product = await Product.findById(id);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "No product found!" });
         }
-       res.status(200).json({success: true, data: productId})
-        
+
+        await Product.findByIdAndDelete(id);
+        res.status(200).json({ success: true, message: "Product deleted successfully!" });
     } catch (error) {
-        res.status(500).json({success:false, message:"Internal error occured ."})
+        console.error("Error deleting product:", error);
+        res.status(500).json({ success: false, message: "Internal server error occurred!" });
     }
-}
+};
 
+// Edit Product
+const editProduct = async (req, res) => {
+    const { id } = req.params;
+    const { name, description, price, category, brand, stock } = req.body;
+    const imageUrlPath = req.files?.map(file => file.path.replace(/\\/g, "/")) || [];
 
+    try {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid Product ID format!" });
+        }
 
+        const existingProduct = await Product.findById(id);
+        if (!existingProduct) {
+            return res.status(404).json({ success: false, message: "No product found!" });
+        }
 
+        const updatedProduct = await Product.findByIdAndUpdate(
+            id,
+            {
+                name: name || existingProduct.name,
+                description: description || existingProduct.description,
+                price: price || existingProduct.price,
+                category: category || existingProduct.category,
+                brand: brand || existingProduct.brand,
+                stock: stock || existingProduct.stock,
+                image: imageUrlPath.length > 0 ? imageUrlPath : existingProduct.image,
+            },
+            { new: true }
+        );
 
+        res.status(200).json({ success: true, message: "Product updated successfully!", product: updatedProduct });
+    } catch (error) {
+        console.error("Error updating product:", error);
+        res.status(500).json({ success: false, message: "Internal server error occurred!" });
+    }
+};
 
+// Get All Products
+const getProducts = async (req, res) => {
+    try {
+        const products = await Product.find({}).populate("category", "name");
+        res.status(200).json({ success: true, message: "Products retrieved successfully!", products });
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        res.status(500).json({ success: false, message: "Internal server error occurred!" });
+    }
+};
 
+// Get Product by ID
+const getProductById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid Product ID format!" });
+        }
 
+        const product = await Product.findById(id).populate("category", "name");
+        if (!product) {
+            return res.status(404).json({ success: false, message: "No product found!" });
+        }
 
+        res.status(200).json({ success: true, product });
+    } catch (error) {
+        console.error("Error fetching product by ID:", error);
+        res.status(500).json({ success: false, message: "Internal server error occurred!" });
+    }
+};
 
-export{createProduct, deteleProduct, editProducts, getProductById, getProducts}
-
+export { createProduct, deleteProduct, editProduct, getProductById, getProducts };
