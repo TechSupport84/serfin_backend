@@ -2,12 +2,17 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
+const uploadDir = "./uploads";
+if (!fs.existsSync(uploadDir)) {
+    try {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    } catch (error) {
+        console.error("Error creating uploads directory:", error);
+    }
+}
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadDir = "./uploads";
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
@@ -27,14 +32,10 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 5 * 1024 * 1024, // Increase to 5MB per file
-        files: 3 // Allow a maximum of 3 files
+        fileSize: 5 * 1024 * 1024, // 5MB per file
+        files: 3 // Max 3 files
     },
     fileFilter: (req, file, cb) => {
-        if (!file) {
-            return cb(new Error("No file provided"), false);
-        }
-
         const fileTypes = /jpeg|jpg|png|gif/;
         const mimeType = fileTypes.test(file.mimetype);
         const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
@@ -42,7 +43,7 @@ const upload = multer({
         if (mimeType && extname) {
             return cb(null, true);
         }
-        cb(new Error("Only images are allowed (jpeg, png, jpg, and gif)"), false);
+        cb(new Error("Only image files are allowed (jpeg, png, jpg, gif)"));
     }
 });
 
