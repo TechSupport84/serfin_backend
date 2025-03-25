@@ -5,8 +5,9 @@ import mongoose from "mongoose";
 // Create Product
 const createProduct = async (req, res) => {
     const { name, description, price, brand, stock, category } = req.body;
-    const imageUrlPath = req.files ? req.files.map(file => file.path.replace(/\\/g, "/")) : [];
-
+    const imageUrlPath = req.files && req.files.length > 0
+    ? req.files.map(file => file.path.replace(/\\/g, "/"))
+    : [];
     try {
         if (!name || !description || !price || !brand || !stock) {
             return res.status(400).json({ success: false, message: "All fields except category are required!" });

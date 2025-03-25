@@ -11,19 +11,30 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
+        if (!file.originalname) {
+            return cb(new Error("Invalid file name"), null);
+        }
+
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const sanitizedFilename = file.originalname
-            .replace(/[^a-zA-Z0-9-_]/g, '-')
-            .replace(/\s+/g, '-')
-            .replace(/\.[^/.]+$/, '');
+            .replace(/[^a-zA-Z0-9.\-_]/g, '-') 
+            .replace(/\s+/g, '-');  
+
         cb(null, `${sanitizedFilename}-${uniqueSuffix}${path.extname(file.originalname)}`);
     }
 });
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 2 * 1024 * 1024 },
+    limits: {
+        fileSize: 5 * 1024 * 1024, // Increase to 5MB per file
+        files: 3 // Allow a maximum of 3 files
+    },
     fileFilter: (req, file, cb) => {
+        if (!file) {
+            return cb(new Error("No file provided"), false);
+        }
+
         const fileTypes = /jpeg|jpg|png|gif/;
         const mimeType = fileTypes.test(file.mimetype);
         const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
@@ -31,7 +42,7 @@ const upload = multer({
         if (mimeType && extname) {
             return cb(null, true);
         }
-        cb(new Error("Only images are allowed (jpeg, png, jpg, and gif)"));
+        cb(new Error("Only images are allowed (jpeg, png, jpg, and gif)"), false);
     }
 });
 
