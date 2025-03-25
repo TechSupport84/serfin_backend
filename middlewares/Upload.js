@@ -2,10 +2,14 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-const uploadDir = "./uploads";
+// Define an absolute path for uploads (use a temp directory for cloud deployments if necessary)
+const uploadDir = path.resolve("uploads");
+
+// Ensure the directory exists
 if (!fs.existsSync(uploadDir)) {
     try {
         fs.mkdirSync(uploadDir, { recursive: true });
+        console.log("Uploads directory created:", uploadDir);
     } catch (error) {
         console.error("Error creating uploads directory:", error);
     }
