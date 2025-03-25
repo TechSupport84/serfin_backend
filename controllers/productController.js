@@ -14,7 +14,6 @@ const createProduct = async (req, res) => {
 
         let categoryId = category;
         
-        // If no category is provided, find and assign the first available category
         if (!categoryId) {
             const defaultCategory = await Category.findOne();
             if (!defaultCategory) {
@@ -42,8 +41,6 @@ const createProduct = async (req, res) => {
     }
 };
 
-
-// Delete Product
 const deleteProduct = async (req, res) => {
     const { id } = req.params;
     try {
@@ -119,12 +116,10 @@ const getProductById = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ success: false, message: "Invalid Product ID format!" });
         }
-
         const product = await Product.findById(id).populate("category", "name");
         if (!product) {
             return res.status(404).json({ success: false, message: "No product found!" });
         }
-
         res.status(200).json({ success: true, product });
     } catch (error) {
         console.error("Error fetching product by ID:", error);

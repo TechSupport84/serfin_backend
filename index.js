@@ -12,6 +12,8 @@ import categoryRouter from './routes/category.js'
 import orderRouter from "./routes/order.js";
 import cartRouter from "./routes/cart.js";
 import paymentRouter from "./routes/payment.js"
+import subscribeRouter from "./routes/subscription.js"
+import sellerRouter from "./routes/sell.js"
 
 const port = process.env.PORT
 const  app = express();
@@ -22,9 +24,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+    credentials: true, 
+    methods: ["GET", "POST", "PUT", "DELETE"], 
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 app.use("/api/auth",router)
@@ -33,6 +35,8 @@ app.use("/api/category",categoryRouter)
 app.use("/api/carts", cartRouter)
 app.use("/api/orders",orderRouter)
 app.use("/api/payment",paymentRouter)
+app.use("/api/subscribe",subscribeRouter )
+app.use("/api/sell", sellerRouter)
 
 
 

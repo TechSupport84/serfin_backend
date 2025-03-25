@@ -1,0 +1,40 @@
+GET  http://localhost:5000/api/product/products
+
+
+####Login 
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "Jeancy01@"
+}
+### create subscription
+POST http://localhost:5000/api/subscribe/
+Content-Type: application/json
+Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjM2ZWRkZDY0YjdkOTM4ODhiYTQwYyIsInVzZXJuYW1lIjoiSmVhbmN5MDAxIiwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDI4OTUzMTIsImV4cCI6MTc0MzUwMDExMn0.WY-hcPlYV5oksAOiIXGU5iougOwLzj5ZJVLFdCQcoNI
+
+{
+    "amount":22.5
+}
+#####Get all Subscription
+GET  http://localhost:5000/api/subscribe/subscribe
+Content-Type: application/json
+Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjM2ZWRkZDY0YjdkOTM4ODhiYTQwYyIsInVzZXJuYW1lIjoiSmVhbmN5MDAxIiwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDI4OTUzMTIsImV4cCI6MTc0MzUwMDExMn0.WY-hcPlYV5oksAOiIXGU5iougOwLzj5ZJVLFdCQcoNI
+
+### Sell Product
+POST http://localhost:5000/api/sell
+Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjM2ZWRkZDY0YjdkOTM4ODhiYTQwYyIsInVzZXJuYW1lIjoiSmVhbmN5MDAxIiwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDI4OTUzMTIsImV4cCI6MTc0MzUwMDExMn0.WY-hcPlYV5oksAOiIXGU5iougOwLzj5ZJVLFdCQcoNI
+Content-Type: application/json
+
+{
+  "productName": "Iphone 11",
+  "description": "Apple  Air 2023",
+  "image": "https://example.com/macbook.jpg",
+  "category": "clothing",
+  "amount": 1500
+}
+### Set all Sell Product
+GET  http://localhost:5000/api/sell
+Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjM2ZWRkZDY0YjdkOTM4ODhiYTQwYyIsInVzZXJuYW1lIjoiSmVhbmN5MDAxIiwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDI4OTUzMTIsImV4cCI6MTc0MzUwMDExMn0.WY-hcPlYV5oksAOiIXGU5iougOwLzj5ZJVLFdCQcoNI
+Content-Type: application/json

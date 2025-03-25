@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 
-// Create a new user
+
 export const register = async (req, res) => {
     const { username, email, password, phone, address, role, wishlist } = req.body;
     const imageFilePath = req.file ? req.file.path.replace(/\\/g, "/") : null;
@@ -17,7 +17,7 @@ export const register = async (req, res) => {
             return res.status(400).json({ success: false, message: "User already exists with this email." });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10); // ✅ Use async hash
+        const hashedPassword = await bcrypt.hash(password, 10); 
         const newUser = new User({
             username,
             email,
@@ -26,7 +26,7 @@ export const register = async (req, res) => {
             phone,
             address,
             role,
-            wishlist: Array.isArray(wishlist) ? wishlist : [] // ✅ Ensure wishlist is an array
+            wishlist: Array.isArray(wishlist) ? wishlist : [] 
         });
 
         await newUser.save();
@@ -62,7 +62,7 @@ export const userLogin = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user._id, username: user.username, email: user.email, role: user.role }, // ✅ Consistent ID and username
+            { id: user._id, username: user.username, email: user.email, role: user.role }, 
             process.env.SECRET_KEY,
             { expiresIn: "7d" }
         );
@@ -91,7 +91,7 @@ export const userLogin = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal server error." });
     }
 };
-// Get user details
+
 export const getUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select("-password -role");
@@ -106,7 +106,7 @@ export const getUser = async (req, res) => {
     }
 };
 
-// Get All Users (excluding password & role)
+
 export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find().select("-password -role");
@@ -117,7 +117,6 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
-// Update user profile (including image)
 export const updateUserProfile = async (req, res) => {
     try {
         const { username, phone, address } = req.body;
@@ -150,12 +149,12 @@ export const modifyPassword = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found." });
         }
 
-        const isPasswordValid = await bcrypt.compare(oldPassword, user.password); // ✅ Use async compare
+        const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ success: false, message: "Incorrect old password." });
         }
 
-        user.password = await bcrypt.hash(newPassword, 10); // ✅ Use async hash
+        user.password = await bcrypt.hash(newPassword, 10); 
         await user.save();
 
         res.status(200).json({ success: true, message: "Password updated successfully!" });
