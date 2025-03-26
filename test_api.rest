@@ -1,5 +1,6 @@
 GET  http://localhost:5000/api/product/products
 
+###all users
 
 ####Login 
 POST http://localhost:5000/api/auth/login
@@ -30,7 +31,7 @@ Content-Type: application/json
 {
   "productName": "Iphone 11",
   "description": "Apple  Air 2023",
-  "image": "https://example.com/macbook.jpg",
+  "image": ["https://example.com/macbook.jpg","https://example.com/macbook.jpg"],
   "category": "clothing",
   "amount": 1500
 }
